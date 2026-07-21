@@ -1,0 +1,12 @@
+{
+  "name": "simco-profit-radar",
+  "version": "0.4.1",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "find . -name '*.js' -not -path './node_modules/*' -print0 | xargs -0 -n1 node --check"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

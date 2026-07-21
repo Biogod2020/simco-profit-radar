@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "SimCo Profit Radar",
+  "version": "0.4.1",
+  "minimum_chrome_version": "102",
+  "description": "Ranks SimCompanies single-stage and multi-stage make-or-buy industry chains across exchange and retail, with seasonal mechanics, rate-limit-safe data loading, current account modifiers, and lifecycle-safe updates.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.simcompanies.com/*",
+    "https://api.simcotools.com/*",
+    "https://simcotools.app/*",
+    "https://www.simcotools.app/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.simcompanies.com/*"
+      ],
+      "js": [
+        "src/platform.js",
+        "src/core.js",
+        "src/bundle.js",
+        "src/retail.js",
+        "src/chain.js",
+        "src/data.js",
+        "src/ui.js",
+        "src/content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.simcompanies.com/*"
+      ],
+      "js": [
+        "bridge-loader.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "page-bridge.js"
+      ],
+      "matches": [
+        "https://www.simcompanies.com/*"
+      ]
+    }
+  ]
+}
