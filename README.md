@@ -45,16 +45,20 @@ The screenshots use deterministic demonstration data and do **not** represent li
 
 ## Download and install
 
-- [Download the current `main` branch as ZIP](https://github.com/Biogod2020/simco-profit-radar/archive/refs/heads/main.zip)
-- The previous prebuilt v0.4.1 package remains in `dist/` only for historical reference; use the current source archive for v0.5.0.
+The verified v0.5.0 archive is generated from the staged release patch by the repository workflow **Reconstruct v0.5.0 release**. After that workflow completes, download:
+
+- `dist/simco-profit-radar-v0.5.0.zip`
+- `dist/simco-profit-radar-v0.5.0.sha256`
+
+If those two files are not visible yet, open the repository **Actions** tab, select **Reconstruct v0.5.0 release**, choose **Run workflow** on `main`, and wait for the bot commit named `release: publish SimCo Profit Radar v0.5.0`.
 
 Installation:
 
-1. Download and unzip the current source archive.
+1. Download and unzip `dist/simco-profit-radar-v0.5.0.zip`.
 2. Open `chrome://extensions` or `edge://extensions`.
 3. Enable **Developer mode**.
 4. Choose **Load unpacked**.
-5. Select the extracted repository folder containing `manifest.json`.
+5. Select the extracted `simco-profit-radar` folder.
 6. Refresh SimCompanies and open **Profit Radar / 利润雷达**.
 
 ## Features
