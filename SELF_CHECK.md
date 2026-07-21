@@ -1,166 +1,75 @@
-# SimCo Profit Radar v0.4.1 — 自检报告
+# SimCo Profit Radar v0.5.0 — Self-check / 自检报告
 
-日期：2026-07-21
+Date / 日期：2026-07-21
 
-## 1. 本轮故障
+## Scope / 本轮范围
 
-用户在 v0.4.0 首次打开面板时看到：
+v0.5.0 adds a runtime bilingual interface with English as the default language and Chinese as an immediately switchable option.
 
-```text
-加载失败：HTTP 429
-```
+v0.5.0 新增运行时中英文双语界面，默认英文，可在不刷新页面、不重新请求数据的情况下立即切换为中文。
 
-代码审计确认这不是产业链公式错误，而是启动请求模型存在缺陷：
+## Internationalization checks / 国际化检查
 
-- 账号基础数据读取完成后，多个 SimCompanies 账号/天气/事件接口会被集中触发；
-- 资源目录、市场价格和游戏零售模型曾并行加载；
-- SimcoTools 资源分页曾并行抓取；
-- 后台没有按主机串行队列、请求合并、`Retry-After`、持久冷却或旧缓存降级；
-- 429 错误只保留了 `HTTP 429`，没有主机、接口和等待时间；
-- 页面已加载的数据桥接存在时序窗口：第一份缓存 dump 可能早于内容脚本监听器，导致本可零请求复用的数据丢失。
+Verified behavior:
 
-## 2. 请求架构修复
+- clean installs default to `en`;
+- settings migrated from schema versions below 5 default to English;
+- the toolbar exposes `English` and `中文`;
+- changing the language updates the existing panel without reloading SimCompanies;
+- the language choice is saved under the existing extension settings key;
+- the choice is restored on future loads;
+- controls, routes, diagnostics, status, result tags, confidence labels, profile fields, seasonal fields, detailed calculations, chain tables, and recovery messages are localized;
+- cached English warnings can be rendered in Chinese and cached Chinese calculation strings can be rendered in English;
+- locale formatting switches between `en-US` and `zh-CN`;
+- arbitrary API resource names remain untouched rather than being translated inaccurately.
 
-v0.4.1 实现：
+已验证：
 
-- 所有主动网络请求按提供商串行排队；
-- 同一缓存键的并发请求合并为一个网络请求；
-- SimCompanies API 与 SimCompanies 静态资源使用独立队列；
-- 扩展主动发起的 SimCompanies API 请求具有五分钟安全门；
-- SimcoTools 分页改为顺序加载；
-- 资源、市场和 bundle 数据改为顺序加载，避免跨回退路径形成突发；
-- 429 有 `Retry-After` 时采用服务端值；
-- 429 没有 `Retry-After` 时默认五分钟冷却，不做秒级快速重试；
-- 429 冷却写入 `chrome.storage.local`，服务工作线程生命周期变化后仍可复用；
-- 已有过期缓存时，429 返回旧快照并附带警告；
-- 无缓存时返回结构化错误：`code/status/host/url/retryAfterMs`。
+- 干净安装默认 `en`；
+- 旧版设置迁移到 schema 5 时默认英文；
+- 顶部工具栏提供 `English` 与 `中文`；
+- 切换语言不刷新 SimCompanies 页面；
+- 语言选择写入原有扩展设置并在后续加载时恢复；
+- 控件、路线、诊断、状态、标签、可信度、账号参数、季节信息、计算详情、产业链表格及恢复提示均可切换；
+- 已缓存的英文警告可切换成中文，内部中文计算字段可切换成英文；
+- 数字和 UTC 日期格式分别采用 `en-US` 与 `zh-CN`；
+- API 返回的任意商品名称保持原样，避免不可靠的自动翻译。
 
-## 3. 零额外流量复用
-
-新增 document-start 页面响应缓冲：
-
-- 观察游戏页面自己发起的 GET `fetch` / XHR；
-- 缓冲账号、管理费、高管、天气、生产事件、公司资料、ticker 和订单簿响应；
-- document-idle 内容脚本安装监听器后主动索取缓冲 dump；
-- 修复“先索取 dump、后安装监听器”导致的丢失；
-- 离开页面或扩展上下文失效时恢复原生 `fetch` / XHR。
-
-页面已经取得的 ticker 或账号数据会直接复用，不再重复请求。
-
-## 4. 账号数据降级
-
-管理费、高管、休闲加成、Summer 天气和官方生产事件改为：
+## Automated verification / 自动化验证
 
 ```text
-页面观察值
-→ 上次规范化缓存
-→ 明确中性假设
+Node automated tests      64 / 64 passed
+JavaScript syntax checks  passed
+Failed / skipped          0 / 0
 ```
 
-它们不再在启动时主动形成一组认证 API 请求。
+Internationalization-specific coverage includes:
 
-若干净安装时连 auth-data 都遭遇 429：
+- English default and unsupported-language normalization;
+- static label and route switching;
+- live DOM switching without reload;
+- persistence to `chrome.storage.local`;
+- dynamic HTTP 429 and account-warning translation;
+- fully English industry-chain detail output with no residual Chinese UI labels;
+- switching the same chain detail back to Chinese;
+- existing lifecycle, cache, network, seasonal, retail, and chain regression coverage.
 
-- 根据页面链接或 realm 标识推断领域；
-- 使用生产加成 0%、销售加成 0%、加速 ×1、Normal 周期等中性参数；
-- 继续尝试加载资源和市场；
-- 状态栏列出缺失字段；
-- 所有结果可信度降为“估算”。
+## Security and packaging / 安全与打包
 
-这不是把中性参数伪装成真实账号数据，而是避免完全空白并明确暴露不确定性。
+The extension remains read-only:
 
-## 5. UI 限流行为
+- ordinary permission: `storage` only;
+- no telemetry;
+- no automated production, retail, contract, or exchange actions;
+- no remote JavaScript;
+- no runtime `eval` or `new Function` (the JSDOM test harness uses `window.eval` only to load local extension modules);
+- no POST, PUT, PATCH, or DELETE request implementation;
+- `node_modules` is excluded from the release archive.
 
-无可用缓存时：
+扩展仍为只读工具：普通权限仅 `storage`，不包含遥测、自动交易/生产操作、远程 JavaScript 或写请求逻辑；发行 ZIP 不包含 `node_modules`。
 
-- 收到 429 后停止当前请求链；
-- 显示具体数据源和接口；
-- 显示秒/分钟倒计时；
-- 冷却结束后只自动重试一次；
-- 第二次仍失败时等待手动刷新；
-- 不无限重试，不把 429 写成普通致命错误。
+## Known boundary / 已知边界
 
-服务端给出较长 `Retry-After` 时，UI 最多可尊重一小时等待，不再强行截短为五分钟。
+The interface is bilingual, but product names supplied by SimCompanies or SimcoTools are displayed as provided. A universal product-name translation layer is intentionally not included because source naming can change and inaccurate translations would reduce auditability.
 
-## 6. 自动化结果
-
-最终发行源代码：
-
-```text
-Node 自动化测试       59 / 59 通过
-JavaScript 语法检查   全部通过
-失败 / 跳过           0 / 0
-```
-
-429 专项覆盖：
-
-- 干净安装首次 429 后按 `Retry-After: 0` 成功重试；
-- 无 `Retry-After` 时直接进入五分钟冷却，网络调用仅一次；
-- 有旧缓存时 429 立即返回旧快照；
-- 无缓存时错误包含主机、URL、状态和等待时间；
-- 相同缓存键并发请求只访问网络一次；
-- 同一主机不同请求不会并发；
-- 429 后不尝试等价的 trailing-slash 端点；
-- 资源分页严格串行；
-- 页面已观察 ticker 时不访问网络；
-- 页面桥接能够缓存并重放早期 auth 响应；
-- auth 429 且无缓存时返回中性 profile，而不是抛出空白失败；
-- profile 启动只允许必要 auth 请求，不主动请求五个可选账号端点；
-- UI 显示倒计时并只安排一次自动重试。
-
-全部原有回归继续通过：
-
-- 多级产业链 make-or-buy 与穷举最优值比对；
-- 产业链交易所/零售、共享上游、循环、深度和 LRU；
-- 原三条生产/零售路线；
-- Steak ×6 加速；
-- 生产事件、Pumpkin、Tree、衰减和 Summer 天气；
-- Q0–Q12；
-- 路径覆盖、HTML 转义和扩展上下文失效恢复。
-
-## 7. 静态安全检查
-
-检查范围：`background.js`、`bridge-loader.js`、`page-bridge.js`、`src/*.js`。
-
-- 未发现业务网络代码中的 POST、PUT、PATCH 或 DELETE；
-- 未发现 `eval` 或 `new Function`；
-- 未发现远程 JavaScript 执行；
-- Manifest 普通权限仍只有 `storage`；
-- 主机权限仅限 SimCompanies 和 SimcoTools；
-- 私有 auth/profile 原始响应使用 `cacheResponse: false`，不写入 HTTP 原始缓存；
-- 扩展只执行只读计算、缓存和页面展示，不执行交易、生产或账户修改。
-
-## 8. 发行包检查
-
-最终 ZIP 已实际完成：
-
-- `node_modules` 未打包；
-- ZIP 根目录为 `simco-profit-radar/`；
-- Manifest 版本为 `0.4.1`；
-- 普通权限为 `storage`；
-- 解压后文件与发行源逐字节一致；
-- 在解压副本上重新执行测试：59/59 通过；
-- 在解压副本上重新执行 JavaScript 语法检查：通过；
-- README、CHANGELOG 和自检报告版本一致；
-- 单独生成 SHA-256 校验文件。
-
-## 9. 未声称完成的验证
-
-执行环境无法进入用户真实 SimCompanies 登录会话，因此没有声称：
-
-- 已复现用户账号当前 429 的具体响应头；
-- 已在用户的 Magnates 公司上完成真实端到端联网验收；
-- 已验证该账号同时运行的其他扩展不会继续消耗同一 API 配额。
-
-本轮 Chromium headless 在容器中即使不加载扩展也无法稳定启动，因此没有把浏览器烟雾测试列为通过项。最终结论基于服务工作线程模拟、JSDOM 内容脚本集成、计算回归、语法检查和发行包比对。
-
-## 10. 真实账号验收步骤
-
-1. 保持原扩展目录路径不变，用 v0.4.1 覆盖文件；
-2. 在 `chrome://extensions` 点击“重新加载”；
-3. 刷新 SimCompanies，确认标题为 `v0.4.1`；
-4. 首次打开后不要反复点击刷新；
-5. 若显示倒计时，等待自动重试；
-6. 若显示“中性账号参数”，先浏览总部/零售相关页面，让游戏自然加载数据，再在冷却结束后刷新；
-7. 检查 profile 中领域、生产加成、销售加成、加速和缺失字段；
-8. 再启用复杂产业链路线。
+界面已双语化，但 SimCompanies / SimcoTools 返回的商品名称仍按数据源原文展示。当前没有强行建立全商品名称翻译表，以免名称更新或错误翻译影响审计。
