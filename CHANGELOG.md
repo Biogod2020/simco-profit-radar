@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.0
+
+- Added a complete English/Chinese runtime internationalization layer.
+- Changed the default interface language to English for new installs and v0.4.x migrations.
+- Added a top-toolbar `Language` selector with immediate, no-reload switching between English and 中文.
+- Persisted the selected language in extension settings and restored it on future page loads.
+- Localized controls, routes, diagnostics, profile fields, status messages, HTTP 429 recovery, result tags, detail panels, seasonal fields, and industry-chain tables.
+- Added bidirectional translation of cached warnings and calculated detail strings so switching language does not require refetching data.
+- Added locale-aware number/date formatting and an updated eight-column responsive toolbar layout.
+- Added language persistence, live-switch, dynamic-warning, and full English chain-detail regression tests; total automated coverage is now 64/64 passing.
+
 ## 0.4.1
 
 - Fixed first-load `HTTP 429` failures caused by bursty multi-provider startup requests.
@@ -67,10 +78,3 @@
 - Added sequential lowest-price ticker → VWAP fallback.
 - Added route coverage diagnostics and exclusion reasons.
 - Added route filter and raised the default display limit to 500.
-- Made targeted search bypass the display limit.
-- Improved official encyclopedia schema normalization.
-- Added explicit price-source labels.
-
-## 0.1.0
-
-- Initial release.
