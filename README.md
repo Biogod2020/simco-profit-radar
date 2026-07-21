@@ -1,15 +1,35 @@
-# SimCo Profit Radar v0.4.1
+# SimCo Profit Radar v0.5.0
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Chrome MV3](https://img.shields.io/badge/Chrome-Manifest%20V3-4285F4)](manifest.json)
+[![Languages](https://img.shields.io/badge/UI-English%20%7C%20中文-3b82f6)](src/i18n.js)
 
-A read-only Chrome / Edge Manifest V3 extension for SimCompanies. It ranks production, retail, and multi-stage make-or-buy industry chains by **PPHPL** (net profit per hour per building level).
+A read-only Chrome / Edge Manifest V3 extension for SimCompanies. It ranks production, retail, and multi-stage make-or-buy industry chains by **PPHPL** (net profit per real hour per building level).
 
-> 非官方 SimCompanies 社区工具；仅进行只读数据分析，不执行自动交易、生产或其他游戏操作。
+一个只读的 SimCompanies Chrome / Edge 扩展，用于按 **PPHPL（每现实小时、每建筑等级净利润）** 比较生产、零售和多级产业链。
+
+> Unofficial community tool. Read-only analysis only: no telemetry, automated trading, production, contracts, or other game actions.
+>
+> 非官方社区工具，仅执行只读分析；无遥测，不执行自动交易、生产、合同或其他游戏操作。
+
+## v0.5.0 — English / 中文
+
+- **English is the default language.**
+- Use the first toolbar selector, **Language**, to switch between `English` and `中文`.
+- The panel changes immediately without reloading SimCompanies or refetching data.
+- The selected language is saved and restored automatically.
+- Controls, routes, diagnostics, profile fields, status messages, HTTP 429 recovery, result tags, detail panels, seasonal fields, and industry-chain tables are localized.
+- Numbers and dates use `en-US` or `zh-CN` formatting according to the active language.
+
+默认语言为**英文**。在面板顶部第一个 `Language` 下拉框中选择 `中文` 即可立即切换；无需刷新游戏页面，选择会自动保存。
 
 ## UI preview
 
-The following images use the actual v0.4.1 interface layout with deterministic demonstration data. Profit, price, and ranking values shown in the images are **not live market results**.
+The screenshots use deterministic demonstration data and do **not** represent live market prices or rankings.
+
+### Runtime language switching
+
+![English and Chinese language switching](docs/screenshots/language-switch.svg)
 
 ### Full-category PPHPL ranking
 
@@ -23,12 +43,19 @@ The following images use the actual v0.4.1 interface layout with deterministic d
 
 ![Seasonal settings and decay](docs/screenshots/settings-seasonal.svg)
 
-## Download
+## Download and install
 
-- [Download v0.4.1](dist/simco-profit-radar-v0.4.1.zip)
-- [SHA-256](dist/simco-profit-radar-v0.4.1.sha256)
+- [Download the current `main` branch as ZIP](https://github.com/Biogod2020/simco-profit-radar/archive/refs/heads/main.zip)
+- The previous prebuilt v0.4.1 package remains in `dist/` only for historical reference; use the current source archive for v0.5.0.
 
-The ZIP contains the complete extension source, tests, documentation, and installable files.
+Installation:
+
+1. Download and unzip the current source archive.
+2. Open `chrome://extensions` or `edge://extensions`.
+3. Enable **Developer mode**.
+4. Choose **Load unpacked**.
+5. Select the extracted repository folder containing `manifest.json`.
+6. Refresh SimCompanies and open **Profit Radar / 利润雷达**.
 
 ## Features
 
@@ -41,21 +68,10 @@ The ZIP contains the complete extension source, tests, documentation, and instal
 - Seasonal production and retail handling
 - Summer weather, Pumpkin seasonality, Tree quality mechanics, and ice-cream decay
 - Current account production/sales modifiers and acceleration
-- Rate-limit-safe loading with 429 cooldown and stale-cache fallback
-- Read-only GET requests; no telemetry or automated game actions
-
-## Install
-
-1. Download and unzip the release ZIP.
-2. Open `chrome://extensions` or `edge://extensions`.
-3. Enable Developer mode.
-4. Choose **Load unpacked**.
-5. Select the extracted `simco-profit-radar` folder.
-6. Refresh SimCompanies and open **利润雷达**.
+- Rate-limit-safe loading with HTTP 429 cooldown and stale-cache fallback
+- Runtime English/Chinese switching with persistent settings
 
 ## Development
-
-The source and tests are included in the ZIP. After extraction:
 
 ```bash
 npm ci
@@ -63,11 +79,11 @@ npm test
 npm run check
 ```
 
-The v0.4.1 release passed 59 automated tests and JavaScript syntax checks. See [SELF_CHECK.md](SELF_CHECK.md) for the detailed validation report.
+v0.5.0 passed **64/64 automated tests** plus JavaScript syntax checks. See [SELF_CHECK.md](SELF_CHECK.md).
 
 ## Limitations
 
-The optimizer is a steady-state operating model. It does not fully model integer building layouts, construction capital, order-book depth, inventory timing, or company-wide multi-product portfolio optimization.
+The optimizer is a steady-state operating model. It does not fully model integer building layouts, construction capital, order-book depth, inventory timing, or company-wide multi-product portfolio optimization. Product names supplied by SimCompanies or SimcoTools are displayed as provided; arbitrary product names are not machine-translated.
 
 ## License
 
