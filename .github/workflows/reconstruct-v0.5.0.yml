@@ -1,6 +1,7 @@
 name: Reconstruct v0.5.0 release
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
