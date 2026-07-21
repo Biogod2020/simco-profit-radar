@@ -1,0 +1,39 @@
+name: Reconstruct v0.5.0 release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.release/v0.5.0/**'
+      - '.github/workflows/reconstruct-v0.5.0.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install zstd
+        run: command -v zstd >/dev/null || (sudo apt-get update && sudo apt-get install -y zstd)
+
+      - name: Reconstruct and verify v0.5.0
+        run: |
+          cat .release/v0.5.0/chunk_* | base64 -d > /tmp/v041-to-v050.zstpatch
+          zstd -d --patch-from=dist/simco-profit-radar-v0.4.1.zip /tmp/v041-to-v050.zstpatch -f -o dist/simco-profit-radar-v0.5.0.zip
+          echo "4714674821cde54a2c257275c14f114af91d25ac27bd445550b6072155bddd49  dist/simco-profit-radar-v0.5.0.zip" | sha256sum -c -
+          echo "4714674821cde54a2c257275c14f114af91d25ac27bd445550b6072155bddd49  simco-profit-radar-v0.5.0.zip" > dist/simco-profit-radar-v0.5.0.sha256
+
+      - name: Commit reconstructed release files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -r .release/v0.5.0
+          git add dist/simco-profit-radar-v0.5.0.zip dist/simco-profit-radar-v0.5.0.sha256
+          git commit -m "release: publish SimCo Profit Radar v0.5.0"
+          git push
