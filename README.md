@@ -1,8 +1,27 @@
 # SimCo Profit Radar v0.4.1
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Chrome MV3](https://img.shields.io/badge/Chrome-Manifest%20V3-4285F4)](manifest.json)
+
 A read-only Chrome / Edge Manifest V3 extension for SimCompanies. It ranks production, retail, and multi-stage make-or-buy industry chains by **PPHPL** (net profit per hour per building level).
 
 > 非官方 SimCompanies 社区工具；仅进行只读数据分析，不执行自动交易、生产或其他游戏操作。
+
+## UI preview
+
+The following images use the actual v0.4.1 interface layout with deterministic demonstration data. Profit, price, and ranking values shown in the images are **not live market results**.
+
+### Full-category PPHPL ranking
+
+![Full-category PPHPL ranking](docs/screenshots/overview.svg)
+
+### Multi-stage make-or-buy chain details
+
+![Industry chain details](docs/screenshots/chain-details.svg)
+
+### Seasonal settings, weather, and decay
+
+![Seasonal settings and decay](docs/screenshots/settings-seasonal.svg)
 
 ## Download
 
