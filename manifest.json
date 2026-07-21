@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "SimCo Profit Radar",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "minimum_chrome_version": "102",
-  "description": "Ranks SimCompanies single-stage and multi-stage make-or-buy industry chains across exchange and retail, with seasonal mechanics, rate-limit-safe data loading, current account modifiers, and lifecycle-safe updates.",
+  "description": "A read-only bilingual English/Chinese SimCompanies profit and industry-chain optimizer with seasonal mechanics and rate-limit-safe loading.",
   "permissions": [
     "storage"
   ],
@@ -22,6 +22,7 @@
         "https://www.simcompanies.com/*"
       ],
       "js": [
+        "src/i18n.js",
         "src/platform.js",
         "src/core.js",
         "src/bundle.js",
